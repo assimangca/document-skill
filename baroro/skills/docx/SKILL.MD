@@ -85,7 +85,13 @@ def add_header_rule(section):
     bottom.set(qn('w:space'), '1')
     bottom.set(qn('w:color'), '999999')
     pBdr.append(bottom)
-    pPr.append(pBdr)
+    for tag in ['w:shd', 'w:tabs', 'w:spacing', 'w:ind', 'w:jc', 'w:rPr']:
+        el = pPr.find(qn(tag))
+        if el is not None:
+            el.addprevious(pBdr)
+            break
+    else:
+        pPr.append(pBdr)
 
 
 def set_header_content(section, left_text=None, right_text=None):
@@ -167,7 +173,14 @@ def set_page_number(section, style='DECIMAL', start=1):
     pgNumType = sectPr.find(qn('w:pgNumType'))
     if pgNumType is None:
         pgNumType = OxmlElement('w:pgNumType')
-        sectPr.append(pgNumType)
+        cols = sectPr.find(qn('w:cols'))
+        docGrid = sectPr.find(qn('w:docGrid'))
+        if cols is not None:
+            cols.addprevious(pgNumType)
+        elif docGrid is not None:
+            docGrid.addprevious(pgNumType)
+        else:
+            sectPr.append(pgNumType)
     pgNumType.set(qn('w:fmt'), style)  # 'decimal', 'upperRoman', 'lowerRoman'
     pgNumType.set(qn('w:start'), str(start))
 
@@ -189,7 +202,13 @@ def add_cover_page(doc, title, subtitle=None, author=None, date=None, color_hex=
     bottom.set(qn('w:space'), '6')
     bottom.set(qn('w:color'), color_hex)
     pBdr.append(bottom)
-    pPr.append(pBdr)
+    for tag in ['w:shd', 'w:tabs', 'w:spacing', 'w:ind', 'w:jc', 'w:rPr']:
+        el = pPr.find(qn(tag))
+        if el is not None:
+            el.addprevious(pBdr)
+            break
+    else:
+        pPr.append(pBdr)
 
     # Title
     p_title = doc.add_paragraph()
@@ -221,7 +240,13 @@ def add_cover_page(doc, title, subtitle=None, author=None, date=None, color_hex=
     top.set(qn('w:space'), '6')
     top.set(qn('w:color'), color_hex)
     pBdr2.append(top)
-    pPr2.append(pBdr2)
+    for tag in ['w:shd', 'w:tabs', 'w:spacing', 'w:ind', 'w:jc', 'w:rPr']:
+        el = pPr2.find(qn(tag))
+        if el is not None:
+            el.addprevious(pBdr2)
+            break
+    else:
+        pPr2.append(pBdr2)
 
     # Spacer
     for _ in range(4):
@@ -427,7 +452,14 @@ for i, hdr in enumerate(headers):
             run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
     # Dark header background
     shading = parse_xml(f'<w:shd {nsdecls("w")} w:fill="1A3C5E" w:val="clear"/>')
-    cell._tc.get_or_add_tcPr().append(shading)
+    tcPr = cell._tc.get_or_add_tcPr()
+    for tag in ['w:noWrap', 'w:tcMar']:
+        el = tcPr.find(qn(tag))
+        if el is not None:
+            el.addprevious(shading)
+            break
+    else:
+        tcPr.append(shading)
 
 milestones = [
     ('Cloud Infrastructure Setup', 'Q1 2026', 'IT Operations', 'In Progress'),
@@ -459,7 +491,14 @@ doc.save('output.docx')
 ```python
 for cell in table.rows[0].cells:
     shading = parse_xml(f'<w:shd {nsdecls("w")} w:fill="1A3C5E" w:val="clear"/>')
-    cell._tc.get_or_add_tcPr().append(shading)
+    tcPr = cell._tc.get_or_add_tcPr()
+    for tag in ['w:noWrap', 'w:tcMar']:
+        el = tcPr.find(qn(tag))
+        if el is not None:
+            el.addprevious(shading)
+            break
+    else:
+        tcPr.append(shading)
     for p in cell.paragraphs:
         for run in p.runs:
             run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
@@ -472,7 +511,14 @@ for i, row in enumerate(table.rows[1:], 1):
     if i % 2 == 0:
         for cell in row.cells:
             shading = parse_xml(f'<w:shd {nsdecls("w")} w:fill="F2F5FA" w:val="clear"/>')
-            cell._tc.get_or_add_tcPr().append(shading)
+            tcPr = cell._tc.get_or_add_tcPr()
+            for tag in ['w:noWrap', 'w:tcMar']:
+                el = tcPr.find(qn(tag))
+                if el is not None:
+                    el.addprevious(shading)
+                    break
+            else:
+                tcPr.append(shading)
 ```
 
 ### Cell vertical alignment + padding
